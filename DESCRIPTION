@@ -17,3 +17,5 @@ Imports:
   nleqslv,
   copula
 LinkingTo: Rcpp
+URL: https://github.com/MiguelB147/CRFpackage
+BugReports: https://github.com/MiguelB147/CRFpackage/issues

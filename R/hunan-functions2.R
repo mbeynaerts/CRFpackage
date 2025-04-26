@@ -754,9 +754,10 @@ testfunc <- function(coef.vector, X1, X2, datalist) {
 
 EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2),
                            type = "ps",quantile = FALSE, scale = FALSE, repara = FALSE,
-                           tol = 0.001, eps = 1e-10, lambda.max = exp(15), maxiter = 10, step.control = FALSE) {
+                           tol = 0.001, eps = 1e-10, lambda.max = exp(15), maxiter = 10, step.control = FALSE,
+                           verbose = TRUE) {
 
-  print("Extended Fellner-Schall method:")
+  if (verbose) print("Extended Fellner-Schall method:")
 
   tiny <- .Machine$double.eps^0.5
 
@@ -880,27 +881,33 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     # Break procedures ----
 
     # Break procedure if REML change and step size are too small
-    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 0.5) {print("REML not changing"); break} # && max.step < 1
+    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 0.5) {if (verbose) print("REML not changing"); break} # && max.step < 1
     # Or break is likelihood does not change
-    if (l1 == l0) {print("Loglik not changing"); break}
+    if (l1 == l0) {if (verbose) print("Loglik not changing"); break}
     # Stop if loglik is not changing
     if (iter==1) old.ll <- fit$ll else {
-      if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {print("Loglik not changing"); break}  # *100
+      if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {if(verbose) print("Loglik not changing"); break}  # *100
       old.ll <- fit$ll
     }
 
     # Print information while running...
-    print(paste0("Iteration ", iter,
-                 ": k = ", k,
-                 # " lambda = ", round(lambda.new,4),
-                 " lambda1 = ", round(lambda.new[1],4),
-                 " lambda2 = ", round(lambda.new[2],4),
-                 " ll = ", round(fit$ll,4),
-                 " REML = ", score[iter]))
+    if (verbose) {
+      print(paste0("Iteration ", iter,
+                   ": k = ", k,
+                   # " lambda = ", round(lambda.new,4),
+                   " lambda1 = ", round(lambda.new[1],4),
+                   " lambda2 = ", round(lambda.new[2],4),
+                   " ll = ", round(fit$ll,4),
+                   " REML = ", score[iter]))
+    }
+
 
   } # End of for loop
 
-  if (iter < maxiter) print("Converged") else print("Number of iterations is too small")
+  if (verbose) {
+    if (iter < maxiter) print("Converged") else print("Number of iterations is too small")
+  }
+
 
   return(list(
     beta = fit$beta,

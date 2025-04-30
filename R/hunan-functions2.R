@@ -34,14 +34,15 @@ theta.frank <- function(x,y,alpha=0.0023) {
   # return(CRF)
 }
 
-theta.mix <- function(t1, t2, w = c(0.2,0.4,0.4), alpha = c(2,3,1.25)) {
+theta.mix <- function(t1, t2, w = c(0.2,0.4,0.4), alpha = c(2,3,1.25), margin = "exp") {
 
-  # S1 <- exp(-t1)
-  # S2 <- exp(-t2)
-
-  S1 <- 1-t1/5
-  S2 <- 1-t2/5
-
+  if(margin == "exp") {
+    S1 <- exp(-t1)
+    S2 <- exp(-t2)
+  } else if (margin == "unif") {
+    S1 <- 1-t1/5
+    S2 <- 1-t2/5
+  }
 
   # Clayton
   kappa <- S1^(-alpha[1]) + S2^(-alpha[1])
@@ -523,7 +524,7 @@ Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
 #   return(-(L1+L2))
 # }
 
-SimData <- function (K, unif.ub = NULL, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4)) {
+SimData <- function (K, unif.ub = NULL, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4), margin = "exp") {
 
   # u1 <- runif(K, 0, 1)
   # u2 <- runif(K, 0, 1)
@@ -541,13 +542,13 @@ SimData <- function (K, unif.ub = NULL, alpha = c(2,3,1.25), weights = c(0.2,0.4
 
   U <- copula::rCopula(K, mx)
 
-
-  # T1 <- -log(U[,1])
-  # T2 <- -log(U[,2])
-
-  T1 <- 5*(1-U[,1])
-  T2 <- 5*(1-U[,2])
-
+  if(margin == "exp") {
+    T1 <- -log(U[,1])
+    T2 <- -log(U[,2])
+  } else if (margin == "unif") {
+    T1 <- 5*(1-U[,1])
+    T2 <- 5*(1-U[,2])
+  }
 
   if (is.null(unif.ub)) {
     # Fan 2000

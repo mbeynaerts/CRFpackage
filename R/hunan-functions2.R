@@ -879,18 +879,6 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     # save loglikelihood value
     score[iter] <- l1
 
-    # Break procedures ----
-
-    # Break procedure if REML change and step size are too small
-    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 1 && max.step < 0.5) {if (verbose) print("REML not changing"); break} # && max.step < 1
-    # Or break is likelihood does not change
-    if (l1 == l0) {if (verbose) print("Loglik not changing"); break}
-    # Stop if loglik is not changing
-    # if (iter==1) old.ll <- fit$ll else {
-    #   if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {if(verbose) print("Loglik not changing"); break}  # *100
-    #   old.ll <- fit$ll
-    # }
-
     # Print information while running...
     if (verbose) {
       print(paste0("Iteration ", iter,
@@ -900,6 +888,20 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
                    " lambda2 = ", round(lambda.new[2],4),
                    " ll = ", round(fit$ll,4),
                    " REML = ", score[iter]))
+
+    # Break procedures ----
+
+    # Break procedure if REML change and step size are too small
+    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 1 && max.step < 0.5) {if (verbose) print("REML not changing"); break} # && max.step < 1
+    # Or break is likelihood does not change
+    # if (l1 == l0) {if (verbose) print("Loglik not changing"); break}
+    # Stop if loglik is not changing
+    # if (iter==1) old.ll <- fit$ll else {
+    #   if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {if(verbose) print("Loglik not changing"); break}  # *100
+    #   old.ll <- fit$ll
+    # }
+
+
     }
 
 

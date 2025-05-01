@@ -886,10 +886,10 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     # Or break is likelihood does not change
     if (l1 == l0) {if (verbose) print("Loglik not changing"); break}
     # Stop if loglik is not changing
-    if (iter==1) old.ll <- fit$ll else {
-      if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {if(verbose) print("Loglik not changing"); break}  # *100
-      old.ll <- fit$ll
-    }
+    # if (iter==1) old.ll <- fit$ll else {
+    #   if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {if(verbose) print("Loglik not changing"); break}  # *100
+    #   old.ll <- fit$ll
+    # }
 
     # Print information while running...
     if (verbose) {

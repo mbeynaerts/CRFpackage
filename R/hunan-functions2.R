@@ -758,7 +758,7 @@ testfunc <- function(coef.vector, X1, X2, datalist) {
 
 EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2),
                            type = "ps",quantile = FALSE, scale = FALSE, repara = FALSE,
-                           tol = 0.001, eps = 1e-10, lambda.max = exp(15), maxiter = 10, step.control = FALSE,
+                           tol = 0.001, eps = 1e-10, lambda.max = exp(15), maxiter = 10, step.control = FALSE, lambda.step = 1,
                            verbose = TRUE) {
 
   if (verbose) print("Extended Fellner-Schall method:")
@@ -895,7 +895,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     # Break procedures ----
 
     # Break procedure if REML change and step size are too small
-    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 1 && max.step < 0.5) {if (verbose) print("REML not changing"); break} # && max.step < 1
+    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 0.5 && max.step < lambda.step) {if (verbose) print("REML not changing"); break} # && max.step < 1
     # Or break is likelihood does not change
     # if (l1 == l0) {if (verbose) print("Loglik not changing"); break}
     # Stop if loglik is not changing

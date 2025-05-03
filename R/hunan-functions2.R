@@ -753,20 +753,28 @@ testfunc <- function(coef.vector, X1, X2, datalist) {
   return(L)
 }
 
+# Create list of control parameters for EstimatePenal
+efs.control <- function(lambda.tol = 1, REML.tol = 0.5, ll.tol = 0.01, maxiter = 10, lambda.max = exp(15)) {
+  list(lambda.tol = lambda.tol,
+       REML.tol = REML.tol,
+       ll.tol = ll.tol,
+       maxiter = maxiter,
+       lambda.max = lambda.max)
+}
+
 # EFS gebaseerd op de code van Simon Wood in het mgcv package (zie gam.fit4.r op github)
 # gam.control() details in mgcv.r op github
-
 EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2),
-                           type = "ps",quantile = FALSE, scale = FALSE, repara = FALSE,
-                           tol = 0.001, eps = 1e-10, lambda.max = exp(15), maxiter = 10, step.control = FALSE, lambda.step = 1,
+                           type = "ps", quantile = FALSE, scale = FALSE, repara = FALSE, step.control = FALSE,
+                           control = efs.control(),
                            verbose = TRUE) {
 
   if (verbose) print("Extended Fellner-Schall method:")
 
   tiny <- .Machine$double.eps^0.5
 
-  obj1 <- WoodSpline(t = datalist$X[,1], dim = dim, degree = 3, type = type, scale = scale, repara = repara, quantile = quantile)
-  obj2 <- WoodSpline(t = datalist$X[,2], dim = dim, degree = 3, type = type, scale = scale, repara = repara, quantile = quantile)
+  obj1 <- WoodSpline(t = datalist$X[,1], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile)
+  obj2 <- WoodSpline(t = datalist$X[,2], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile)
 
   X1 <- obj1$X
   X2 <- obj2$X
@@ -783,8 +791,8 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
                    # Sl = lambda.init*S
                    Sl = lambda.init[1]*S1 + lambda.init[2]*S2)
   k <- 1
-  score <- rep(0, maxiter)
-  for (iter in 1:maxiter) {
+  score <- rep(0, control$maxiter)
+  for (iter in 1:control$maxiter) {
 
     l0 <- fit$REML
 
@@ -822,7 +830,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     update <- a/pmax(tiny, bSb)
     update[a==0 & bSb==0] <- 1
     update[!is.finite(update)] <- 1e6
-    lambda.new <- pmin(update*lambda, lambda.max)
+    lambda.new <- pmin(update*lambda, control$lambda.max)
 
     # Step length of update
     max.step <- max(abs(lambda.new - lambda))
@@ -857,7 +865,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
         lambda3 <- lambda.new
         while (lk < l0 && k > 1) { # Don't contract too much since the likelihood does not need to increase k > 0.001
           k <- k/2 ## Contract step
-          lambda3 <- pmin(lambda*update^k, lambda.max)
+          lambda3 <- pmin(lambda*update^k, control$lambda.max)
           fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist,
                            # Sl = lambda3*S
                            Sl = lambda3[1]*S1 + lambda3[2]*S2
@@ -891,27 +899,28 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
                    " lambda2 = ", round(lambda.new[2],4),
                    " ll = ", round(fit$ll,4),
                    " REML = ", score[iter]))
+    }
 
     # Break procedures ----
 
     # Break procedure if REML change and step size are too small
-    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < 0.5 && max.step < lambda.step) {if (verbose) print("REML not changing"); break} # && max.step < 1
+    if (iter > 3 && max(abs(diff(score[(iter-3):iter]))) < control$REML.tol && max.step < control$lambda.tol) {
+      if (verbose) print("REML not changing")
+      break
+    }
     # Or break is likelihood does not change
     # if (l1 == l0) {if (verbose) print("Loglik not changing"); break}
+
     # Stop if loglik is not changing
-    # if (iter==1) old.ll <- fit$ll else {
-    #   if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll)) {if(verbose) print("Loglik not changing"); break}  # *100
-    #   old.ll <- fit$ll
-    # }
-
-
+    if (iter==1) old.ll <- fit$ll else {
+      if (abs(old.ll-fit$ll)<control$ll.tol) {if(verbose) print("Loglik not changing"); break}  # if (abs(old.ll-fit$ll)<100*eps*abs(fit$ll))
+      old.ll <- fit$ll
     }
-
 
   } # End of for loop
 
   if (verbose) {
-    if (iter < maxiter) print("Converged") else print("Number of iterations is too small")
+    if (iter < control$maxiter) print("Converged") else print("Maximum number of iterations reached")
   }
 
 

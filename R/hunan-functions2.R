@@ -754,12 +754,13 @@ testfunc <- function(coef.vector, X1, X2, datalist) {
 }
 
 # Create list of control parameters for EstimatePenal
-efs.control <- function(lambda.tol = 1, REML.tol = 0.5, ll.tol = 0.01, maxiter = 10, lambda.max = exp(15)) {
+efs.control <- function(lambda.tol = 1, REML.tol = 0.5, ll.tol = 0.01, maxiter = 10, lambda.max = exp(15), knot.margin = 0.001) {
   list(lambda.tol = lambda.tol,
        REML.tol = REML.tol,
        ll.tol = ll.tol,
        maxiter = maxiter,
-       lambda.max = lambda.max)
+       lambda.max = lambda.max,
+       knot.margin = knot.margin)
 }
 
 # EFS gebaseerd op de code van Simon Wood in het mgcv package (zie gam.fit4.r op github)
@@ -773,8 +774,8 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 
   tiny <- .Machine$double.eps^0.5
 
-  obj1 <- WoodSpline(t = datalist$X[,1], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile)
-  obj2 <- WoodSpline(t = datalist$X[,2], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile)
+  obj1 <- WoodSpline(t = datalist$X[,1], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile, knot.margin = control$knot.margin)
+  obj2 <- WoodSpline(t = datalist$X[,2], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile, knot.margin = control$knot.margin)
 
   X1 <- obj1$X
   X2 <- obj2$X

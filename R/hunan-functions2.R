@@ -164,7 +164,7 @@ poly.fit <- function (beta, datalist, deriv) {
 
 }
 
-WoodSpline <- function(t, dim, degree = 3, type = "ps", quantile = FALSE, scale = TRUE, repara = TRUE, m2 = degree-1) {
+WoodSpline <- function(t, dim, degree = 3, type = "ps", quantile = FALSE, scale = TRUE, repara = TRUE, m2 = degree-1, knot.margin = 0.001) {
 
   # Create knot sequence for spline ----
   nk <- dim - degree + 1 # Number of "interior" knots (internal + boundary)
@@ -172,7 +172,7 @@ WoodSpline <- function(t, dim, degree = 3, type = "ps", quantile = FALSE, scale 
   xl <- min(t)
   xu <- max(t)
   xr <- xu - xl
-  xl <- xl-xr*0.001; xu <- xu+xr*0.001
+  xl <- xl-xr*knot.margin; xu <- xu+xr*knot.margin
   dx <- (xu-xl)/(nk-1)
   knots <- seq(xl-dx*degree,xu+dx*degree,length=nk+2*degree) # Vector of knots
   if (quantile) {

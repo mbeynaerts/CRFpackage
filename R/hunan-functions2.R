@@ -971,7 +971,7 @@ EstimatePoly <- function(start = rep(0,10), datalist) {
   beta <- nleqslv::nleqslv(x = start, fn = poly.fit, jac = HessianPoly, method = "Broyden", global = "hook", deriv = deriv, datalist = datalist)
   V <- HessianPoly(beta$x, datalist, deriv)
 
-  return(beta$x, vcov = solve(V))
+  return(list(beta$x, vcov = solve(V)))
 
 }
 

@@ -938,7 +938,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
   return(list(
     beta = fit$beta,
     lambda = lambda.new,
-    vcov = V,
+    vcov = solve(fit$hessian + Sl.new),
     iterations = iter,
     ll = fit$ll,
     history = score[1:iter],

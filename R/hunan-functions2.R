@@ -681,7 +681,8 @@ SimData <- function (K, cens.par = 0, alpha = c(2,3,1.25), weights = c(0.2,0.4,0
   delta.prod1 <- c(t(delta.prod))
   delta.prod2 <- c(delta.prod)
 
-  return(list(X = cbind(X[,1],X[,2]),
+  return(list(X = X,
+              idx = delta,
               # knots = cbind(knots1,knots2),
               riskset1 = N1,
               riskset2 = N2,

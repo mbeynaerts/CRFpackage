@@ -538,7 +538,7 @@ Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
 #   return(-(L1+L2))
 # }
 
-SimData <- function (K, unif.ub = NULL, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4), margin = "exp") {
+SimData <- function (K, cens.par = 0, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4), margin = "exp") {
 
   # u1 <- runif(K, 0, 1)
   # u2 <- runif(K, 0, 1)
@@ -564,19 +564,10 @@ SimData <- function (K, unif.ub = NULL, alpha = c(2,3,1.25), weights = c(0.2,0.4
     T2 <- 5*(1-U[,2])
   }
 
-  if (is.null(unif.ub)) {
-    # Fan 2000
-    X1 <- T1
-    X2 <- T2
+  if (cens.par > 0) {
 
-    X <- as.matrix(cbind(X1,X2))
-
-    delta1 <- delta2 <- rep(1, K)
-
-  } else {
-    # Hu 2011
-    C1 <- runif(K, 0, unif.ub)
-    C2 <- runif(K, 0, unif.ub)
+    C1 <- rexp(K, cens.par)
+    C2 <- rexp(K, cens.par)
 
     X1 <- pmin(T1,C1)
     X2 <- pmin(T2,C2)
@@ -585,6 +576,16 @@ SimData <- function (K, unif.ub = NULL, alpha = c(2,3,1.25), weights = c(0.2,0.4
 
     delta1 <- 1*(T1 <= C1)
     delta2 <- 1*(T2 <= C2)
+
+
+  } else {
+
+    X1 <- T1
+    X2 <- T2
+
+    X <- as.matrix(cbind(X1,X2))
+
+    delta1 <- delta2 <- rep(1, K)
   }
 
   delta <- as.matrix(cbind(delta1,delta2))

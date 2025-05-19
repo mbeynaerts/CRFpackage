@@ -325,10 +325,13 @@ WoodTensor.predict <- function(t1, t2, fit, logCRF = TRUE) {
 
   # Calculate standard error of log(theta)
   # var.logtheta <- X %*% fit$vcov %*% t(X)
-  var.logtheta <- sapply(1:nrow(X), function(i) t(X[i,]) %*% fit$vcov %*% X[i,])
-  se.logtheta <- sqrt(var.logtheta)
+  if (logCRF) {
+    var.logtheta <- sapply(1:nrow(X), function(i) t(X[i,]) %*% fit$vcov %*% X[i,])
+    se.logtheta <- sqrt(var.logtheta)
+    return(data.frame(estimate = spline, se = se.logtheta))
+  } else return(exp(spline))
 
-  return(data.frame(estimate = ifelse(logCRF, spline, exp(spline)), se = se.logtheta))
+
 
 }
 

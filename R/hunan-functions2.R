@@ -103,7 +103,8 @@ polynomial <- function(t1,t2, coef.vec, logCRF = TRUE) {
     coef.vec[7]*(t1^2)*t2 + coef.vec[8]*t1*(t2^2) +
     coef.vec[9]*t1^3 + coef.vec[10]*t2^3
 
-  return(ifelse(logCRF, logtheta, exp(logtheta)))
+  if (logCRF) return(logtheta)
+  else return(exp(logtheta))
 
 }
 

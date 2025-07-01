@@ -542,7 +542,7 @@ Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
 #   return(-(L1+L2))
 # }
 
-SimData <- function (K, cens.par = 0, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4), margin = "exp") {
+SimData <- function (K, cens.par = 0, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4), margin = "exp", ...) {
 
   # u1 <- runif(K, 0, 1)
   # u2 <- runif(K, 0, 1)
@@ -560,13 +560,19 @@ SimData <- function (K, cens.par = 0, alpha = c(2,3,1.25), weights = c(0.2,0.4,0
 
   U <- copula::rCopula(K, mx)
 
-  if(margin == "exp") {
-    T1 <- -log(U[,1])
-    T2 <- -log(U[,2])
-  } else if (margin == "unif") {
-    T1 <- 5*(1-U[,1])
-    T2 <- 5*(1-U[,2])
-  }
+  # if(margin == "exp") {
+  #   T1 <- -log(U[,1])
+  #   T2 <- -log(U[,2])
+  # } else if (margin == "unif") {
+  #   T1 <- 5*(1-U[,1])
+  #   T2 <- 5*(1-U[,2])
+  # }
+
+  margin_dist <- paste0("q", margin)
+
+  T1 <- get(margin_dist)(p = U[,1], lower.tail = FALSE, ...)
+  T2 <- get(margin_dist)(p = U[,2], lower.tail = FALSE, ...)
+
 
   if (cens.par > 0) {
 

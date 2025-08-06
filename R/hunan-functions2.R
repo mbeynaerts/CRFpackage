@@ -34,7 +34,7 @@ theta.frank <- function(x,y,alpha=0.0023) {
   # return(CRF)
 }
 
-theta.mix <- function(t1, t2, w = c(0.2,0.4,0.4), alpha = c(2,3,1.25), margin = "exp") {
+theta.mix <- function(t1, t2, w = c(0.2,0.4,0.4), alpha = c(3,5,1.5), margin = "unif") {
 
   if(margin == "exp") {
     S1 <- exp(-t1)
@@ -44,58 +44,21 @@ theta.mix <- function(t1, t2, w = c(0.2,0.4,0.4), alpha = c(2,3,1.25), margin = 
     S2 <- 1-t2/5
   }
 
-  clayton <- frank <- gumbel <- matrix(0, nrow = length(t1), ncol = 4)
+  mx <- copula::mixCopula(list(copula::claytonCopula(alpha[1], dim = 2),
+                               copula::frankCopula(alpha[2], dim = 2),
+                               copula::gumbelCopula(alpha[3], dim = 2)),
+                          w = w)
 
-  # Clayton
-  if (w[1] > 0) {
-    kappa <- S1^(-alpha[1]) + S2^(-alpha[1])
-    clayton[,1] <- kappa^(-1/alpha[1]) # C00
-    clayton[,2] <- kappa^(-1/alpha[1]-1)*S1^(-alpha[1]-1) # C10
-    clayton[,3] <- kappa^(-1/alpha[1]-1)*S2^(-alpha[1]-1) # C01
-    clayton[,4] <- (1+alpha[1])*S1^(-alpha[1]-1)*S2^(-alpha[1]-1)*kappa^(-1/alpha[1]-2) # C11
-  }
-
-
-  # Frank
-  if (w[2] > 0) {
-    phi <- exp(-alpha[2])-1
-    mu1 <- exp(-alpha[2]*S1) - 1
-    mu2 <- exp(-alpha[2]*S2) - 1
-    frank[,1] <- (-1/alpha[2])*log(1 + mu1*mu2/phi) # C00
-    frank[,2] <- mu2*(mu1 + 1)*phi^(-1)/(1+mu1*mu2*phi^(-1)) # C10
-    frank[,3] <- mu1*(mu2 + 1)*phi^(-1)/(1+mu1*mu2*phi^(-1)) # C01
-    frank[,4] <- -alpha[2]*phi^(-1)*(mu1+1)*(mu2+1)/(1+phi^(-1)*mu1*mu2)^2 # C11
-  }
-
-
-  # Gumbel
-
-  # cop = copula::gumbelCopula(1.25)
-  # cbind(gumbel.00, copula::pCopula(cbind(S1,S2), cop))
-  # cbind(gumbel.11, copula::dCopula(cbind(S1,S2), cop))
-
-  if (w[3] > 0) {
-    nu <- (-log(S1))^alpha[3] + (-log(S2))^alpha[3]
-    nu1 <- (-log(S1))^(alpha[3]-1)/S1
-    nu2 <- (-log(S2))^(alpha[3]-1)/S2
-    gumbel[,1] <- exp( -nu^(1/alpha[3]) ) # C00
-    gumbel[,2] <- gumbel[,1]*nu^(1/alpha[3]-1)*nu1 # C10
-    gumbel[,3] <- gumbel[,1]*nu^(1/alpha[3]-1)*nu2 # C01
-    gumbel[,4] <- gumbel[,1]*nu1*nu2*(nu^(2/alpha[3] - 2) + (alpha[3]-1)*nu^(1/alpha[3] - 2) ) # C11
-  }
-
-
-  C00 <- cbind(clayton[,1], frank[,1], gumbel[,1]) %*% w
-  C10 <- cbind(clayton[,2], frank[,2], gumbel[,2]) %*% w
-  C01 <- cbind(clayton[,3], frank[,3], gumbel[,3]) %*% w
-  C11 <- cbind(clayton[,4], frank[,4], gumbel[,4]) %*% w
+  C00 <- copula::pCopula(cbind(S1, S2), mx)
+  C11 <- copula::dCopula(cbind(S1, S2), mx)
+  C10 <- copula::cCopula(cbind(S1, S2), mx)[,2]
+  C01 <- copula::cCopula(cbind(S2, S1), mx)[,2]
 
   CRF <- C00*C11/(C01*C10)
 
   return(CRF)
 
 }
-
 polynomial <- function(t1,t2, coef.vec, logCRF = TRUE) {
 
   logtheta <- coef.vec[1] + coef.vec[2]*t1 + coef.vec[3]*t2 +

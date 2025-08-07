@@ -505,7 +505,7 @@ Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
 #   return(-(L1+L2))
 # }
 
-SimData <- function (K, cens.par = 0, alpha = c(2,3,1.25), weights = c(0.2,0.4,0.4), margin = "exp", ...) {
+SimData <- function (K, cens.par = 0, alpha = c(3,5,1.5), weights = c(0.2,0.4,0.4), margin = "exp", ...) {
 
   # u1 <- runif(K, 0, 1)
   # u2 <- runif(K, 0, 1)

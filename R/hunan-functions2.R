@@ -669,6 +669,97 @@ SimData <- function (K, cens.par = 0, alpha = c(3,5,1.5), weights = c(0.2,0.4,0.
               delta2 = delta.prod2[N2 > 0]))
 }
 
+PrepareData <- function (t1, t2, cens1, cens2) {
+
+  X <- as.matrix(cbind(t1,t2))
+  delta <- as.matrix(cbind(cens1,cens2))
+
+
+  ## Check whether first delta1=delta2=1
+
+
+  row_index <- which(delta1 == 1 & delta2 == 1 , arr.ind = TRUE)[1] # First observation with delta1=delta2=1
+
+  # Switch rows
+  if (row_index > 1) {
+
+    tmp_row_X <- X[1,]
+    tmp_row_delta <- delta[1,]
+
+    X[1,] <- X[row_index,]
+    delta[1,] <- delta[row_index,]
+
+    X[row_index,] <- tmp_row_X
+    delta[row_index,] <- tmp_row_delta
+
+    rm(tmp_row_delta, tmp_row_X, row_index)
+
+  } else {X <- X; delta <- delta}
+
+
+
+  ## Calculating the risk set
+
+  # N <- outer(X[,1], X[,2], function(x,y) mapply(riskset,x,y))
+  # N1 <- c(t(N))
+  # N2 <- c(N)
+
+  N <- risksetC(X[,1],X[,2])
+  N1 <- c(t(N))
+  N2 <- c(N)
+
+
+  ## Calculating indicator functions in likelihood
+
+  #### I(X1j >= X1i)
+  # I1 <- sapply(X[,1], function(x) 1*(X[,1] >= x)) # col=1,...,i,...,n row=1,...,j,...,n
+  I1 <- IndGreater(X[,1])
+
+  #### I(X2j <= X2i)
+  # I2 <- sapply(X[,2], function(x) 1*(X[,2] <= x)) # col=1,...,i,...,n row=1,...,j,...,n
+  I2 <- IndLess(X[,2])
+
+  #### I(X2j >= X2i)
+  # I3 <- sapply(X[,2], function(x) 1*(X[,2] >= x)) # col=1,...,i,...,n row=1,...,j,...,n
+  I3 <- t(I2)
+  #
+  # #### I(X1j <= X1i)
+  # # I4 <- sapply(X[,1], function(x) 1*(X[,1] <= x)) # col=1,...,i,...,n row=1,...,j,...,n
+  I4 <- t(I1)
+
+  #### I(X1j = X1i) NOTE THAT THIS IS DIAG(1,500,500) IF NO TIES
+  # I5 <- sapply(X[,1], function(x) 1*(X[,1] == x)) # col=1,...,i,...,n row=1,...,j,...,n
+  I5 <- IndEqual(X[,1])
+
+  #### I(X2j = X2i) NOTE THAT THIS IS DIAG(1,500,500) IF NO TIES
+  # I6 <- sapply(X[,2], function(x) 1*(X[,2] == x)) # col=1,...,i,...,n row=1,...,j,...,n
+  I6 <- IndEqual(X[,2])
+
+  #I1 <- lapply(X1, function(x) 1*(X2 >= x))
+  #test <- matrix(unlist(I1), ncol = 500, byrow = FALSE)
+
+
+  # A1 <- c(I1*outer(delta[,2], delta[,1]))[N1 > 0]
+  # A2 <- c(I3*outer(delta[,1], delta[,2]))[N2 > 0]
+
+  delta.prod = DeltaC(delta[,1], delta[,2])
+  delta.prod1 <- c(t(delta.prod))
+  delta.prod2 <- c(delta.prod)
+
+  return(list(X = X,
+              idx = delta,
+              riskset1 = N1,
+              riskset2 = N2,
+              I1 = c(I1)[N1 > 0],
+              I2 = c(I2)[N1 > 0],
+              I3 = c(I3)[N2 > 0],
+              I4 = c(I4)[N2 > 0],
+              I5 = c(I5)[N1 > 0],
+              I6 = c(I6)[N2 > 0],
+              delta1 = delta.prod1[N1 > 0],
+              delta2 = delta.prod2[N2 > 0]))
+}
+
 wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLogLik=TRUE) { # H is hier gewoon de unpenalized hessian
 
   # Check whether penalty is applied

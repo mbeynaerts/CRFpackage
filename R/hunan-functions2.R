@@ -678,7 +678,7 @@ PrepareData <- function (t1, t2, cens1, cens2) {
   ## Check whether first delta1=delta2=1
 
 
-  row_index <- which(delta1 == 1 & delta2 == 1 , arr.ind = TRUE)[1] # First observation with delta1=delta2=1
+  row_index <- which(delta[,1] == 1 & delta[,2] == 1 , arr.ind = TRUE)[1] # First observation with delta1=delta2=1
 
   # Switch rows
   if (row_index > 1) {

@@ -104,13 +104,15 @@ double logLikC(const NumericVector &riskset1,
                const NumericVector &I3,
                const NumericVector &I4,
                const NumericVector &I5,
-               const NumericVector &I6) {
+               const NumericVector &I6,
+               const NumericVector w1,
+               const NumericVector w2) {
 
   double sum1;
   double sum2;
 
-  sum1 = Rcpp::sum(delta1*I1*(logtheta1*I5 - Rcpp::log(riskset1 + I2*Rcpp::exp(logtheta1) - I2)));
-  sum2 = Rcpp::sum(delta2*I3*(logtheta2*I6 - Rcpp::log(riskset2 + I4*Rcpp::exp(logtheta2) - I4)));
+  sum1 = Rcpp::sum(w1*delta1*I1*(logtheta1*I5 - Rcpp::log(riskset1 + I2*Rcpp::exp(logtheta1) - I2)));
+  sum2 = Rcpp::sum(w2*delta2*I3*(logtheta2*I6 - Rcpp::log(riskset2 + I4*Rcpp::exp(logtheta2) - I4)));
 
   return(-sum1-sum2);
 }
@@ -129,8 +131,9 @@ NumericVector gradientC(const NumericVector &riskset1,
                         const NumericVector &I3,
                         const NumericVector &I4,
                         const NumericVector &I5,
-                        const NumericVector &I6
-) {
+                        const NumericVector &I6,
+                        const NumericVector w1,
+                        const NumericVector w2) {
 
   int n = riskset1.length();
   int totalparam = df*df;
@@ -146,8 +149,8 @@ NumericVector gradientC(const NumericVector &riskset1,
   }
 
 
-  common1 = delta1*I1*(I5 - I2*Rcpp::exp(logtheta1)/(riskset1 + I2*Rcpp::exp(logtheta1) - I2));
-  common2 = delta2*I3*(I6 - I4*Rcpp::exp(logtheta2)/(riskset2 + I4*Rcpp::exp(logtheta2) - I4));
+  common1 = w1*delta1*I1*(I5 - I2*Rcpp::exp(logtheta1)/(riskset1 + I2*Rcpp::exp(logtheta1) - I2));
+  common2 = w2*delta2*I3*(I6 - I4*Rcpp::exp(logtheta2)/(riskset2 + I4*Rcpp::exp(logtheta2) - I4));
 
   for (int m=0; m<totalparam; m++) {
 
@@ -234,7 +237,9 @@ NumericMatrix hessianC(const NumericVector &riskset1,
                        const NumericVector &I1,
                        const NumericVector &I2,
                        const NumericVector &I3,
-                       const NumericVector &I4) {
+                       const NumericVector &I4,
+                       const NumericVector w1,
+                       const NumericVector w2) {
 
   int n = riskset1.length();
   int totalparam = df*df;
@@ -252,8 +257,8 @@ NumericMatrix hessianC(const NumericVector &riskset1,
     deriv_vec[k] = deriv_R;
   }
 
-    common1 = -delta1*I1*(riskset1 - I2)*I2*Rcpp::exp(logtheta1)/Rcpp::pow(riskset1 - I2 + I2*Rcpp::exp(logtheta1),2);
-    common2 = -delta2*I3*(riskset2 - I4)*I4*Rcpp::exp(logtheta2)/Rcpp::pow(riskset2 - I4 + I4*Rcpp::exp(logtheta2),2);
+    common1 = -w1*delta1*I1*(riskset1 - I2)*I2*Rcpp::exp(logtheta1)/Rcpp::pow(riskset1 - I2 + I2*Rcpp::exp(logtheta1),2);
+    common2 = -w2*delta2*I3*(riskset2 - I4)*I4*Rcpp::exp(logtheta2)/Rcpp::pow(riskset2 - I4 + I4*Rcpp::exp(logtheta2),2);
 
   for (int m = 0; m < totalparam; m++) {
     for (int l = m; l < totalparam; l++) {

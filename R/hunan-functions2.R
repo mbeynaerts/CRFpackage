@@ -403,7 +403,7 @@ deriv_comp_poly <- function(datalist) {
 # }
 #
 
-Hessian <- function (coef.vector, X1, X2, Sl = NULL, deriv, datalist) {
+Hessian <- function (coef.vector, X1, X2, Sl = NULL, deriv, datalist, weights) {
 
   df <- ncol(X1)
 
@@ -411,6 +411,9 @@ Hessian <- function (coef.vector, X1, X2, Sl = NULL, deriv, datalist) {
   logtheta <- WoodTensor(X1, X2, coef.vector = coef.vector)
   logtheta2 <- c(logtheta)[datalist$riskset2 > 0]
   logtheta1 <- c(t(logtheta))[datalist$riskset1 > 0]
+
+  w1 <- weights[datalist$riskset1 > 0]
+  w2 <- weights[datalist$riskset2 > 0]
 
   hessian <- hessianC(riskset1 = datalist$riskset1[datalist$riskset1>0],
                       riskset2 = datalist$riskset2[datalist$riskset2>0],
@@ -423,7 +426,9 @@ Hessian <- function (coef.vector, X1, X2, Sl = NULL, deriv, datalist) {
                       I1 = datalist$I1,
                       I2 = datalist$I2,
                       I3 = datalist$I3,
-                      I4 = datalist$I4)
+                      I4 = datalist$I4,
+                      w1 = w1,
+                      w2 = w2)
 
   if (!is.null(Sl)) hessian <- hessian + Sl
 
@@ -454,7 +459,7 @@ HessianPoly <- function(beta, datalist, deriv) {
 }
 
 
-Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
+Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL, weights) {
 
   # Tensor product spline
   logtheta <- WoodTensor(X1, X2, coef.vector = coef.vector)
@@ -463,6 +468,9 @@ Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
 
   N1 <- datalist$riskset1[datalist$riskset1 > 0]
   N2 <- datalist$riskset2[datalist$riskset2 > 0]
+
+  w1 <- weights[datalist$riskset1 > 0]
+  w2 <- weights[datalist$riskset2 > 0]
 
   df <- ncol(X1)
 
@@ -479,7 +487,9 @@ Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL) {
                         I3 = datalist$I3,
                         I4 = datalist$I4,
                         I5 = datalist$I5,
-                        I6 = datalist$I6) # gradientC returns vector of derivatives of -loglik
+                        I6 = datalist$I6,
+                        w1 = w1,
+                        w2 = w2) # gradientC returns vector of derivatives of -loglik
 
   if (!is.null(Sl)) penalty <- t(coef.vector) %*% Sl
   else penalty <- 0
@@ -760,7 +770,7 @@ PrepareData <- function (t1, t2, cens1, cens2) {
               delta2 = delta.prod2[N2 > 0]))
 }
 
-wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLogLik=TRUE) { # H is hier gewoon de unpenalized hessian
+wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLogLik=TRUE, weights) { # H is hier gewoon de unpenalized hessian
 
   # Check whether penalty is applied
   if (is.null(Sl)) {
@@ -788,6 +798,9 @@ wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLo
   logtheta1 <- c(t(logtheta))[datalist$riskset1 > 0]
   logtheta2 <- c(logtheta)[datalist$riskset2 > 0]
 
+  w1 <- weights[datalist$riskset1 > 0]
+  w2 <- weights[datalist$riskset2 > 0]
+
   L <- logLikC(riskset1 = datalist$riskset1[datalist$riskset1 > 0],
                riskset2 = datalist$riskset2[datalist$riskset2 > 0],
                logtheta1 = logtheta1,
@@ -799,7 +812,9 @@ wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLo
                I3 = datalist$I3,
                I4 = datalist$I4,
                I5 = datalist$I5,
-               I6 = datalist$I6)
+               I6 = datalist$I6,
+               w1 = w1,
+               w2 = w2)
 
 
   ll <- L + penaltyLik/2
@@ -843,14 +858,21 @@ efs.control <- function(lambda.tol = 1, REML.tol = 0.5, ll.tol = 0.01, maxiter =
        knot.margin = knot.margin)
 }
 
+nleqslv.control <- function(method = "Broyden", global = "hook") {
+  list(method = method,
+       global = global)
+}
+
 # EFS gebaseerd op de code van Simon Wood in het mgcv package (zie gam.fit4.r op github)
 # gam.control() details in mgcv.r op github
-EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2),
+EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2), weights = NULL,
                            type = "ps", quantile = FALSE, scale = FALSE, repara = FALSE, step.control = FALSE,
                            control = efs.control(),
                            verbose = TRUE) {
 
   if (verbose) print("Extended Fellner-Schall method:")
+
+  if (is.null(weights)) weights <- rep(1, length(datalist$X[,1])^2)
 
   tiny <- .Machine$double.eps^0.5
 
@@ -870,7 +892,8 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 
   fit <- efsud.fit2(start = start, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp,
                    # Sl = lambda.init*S
-                   Sl = lambda.init[1]*S1 + lambda.init[2]*S2)
+                   Sl = lambda.init[1]*S1 + lambda.init[2]*S2,
+                   weights = weights)
   k <- 1
   score <- rep(0, control$maxiter)
   for (iter in 1:control$maxiter) {
@@ -920,7 +943,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     Sl.new <- lambda.new[1]*S1 + lambda.new[2]*S2
     # Sl.new <- lambda.new*S
 
-    fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp, Sl = Sl.new)
+    fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp, Sl = Sl.new, weights = weights)
     l1 <- fit$REML
 
     # Start of step control ----
@@ -931,8 +954,8 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
           lambda2 <- pmin(lambda*update^(k*2), exp(12))
           fit2 <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist,
                             # Sl = lambda2*S
-                            Sl = lambda2[1]*S1 + lambda2[2]*S2
-          )
+                            Sl = lambda2[1]*S1 + lambda2[2]*S2,
+                            weights = weights)
           l2 <- fit2$REML
           if (l2 > l1) { # Improvement - accept extension
             lambda.new <- lambda2
@@ -949,8 +972,8 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
           lambda3 <- pmin(lambda*update^k, control$lambda.max)
           fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist,
                            # Sl = lambda3*S
-                           Sl = lambda3[1]*S1 + lambda3[2]*S2
-          )
+                           Sl = lambda3[1]*S1 + lambda3[2]*S2,
+                           weights = weights)
           lk <- fit$REML
 
           # k <- k + 1
@@ -1019,17 +1042,19 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 
 efsud.fit2 <- function(start, X1, X2, datalist, Sl, deriv.comp = NULL) {
 
-  if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist)
+  if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist, weights)
   else deriv <- deriv.comp
 
   # beta <- multiroot(Score2, start = start, jacfunc = Hessian, jactype = "fullusr", rtol = 1e-10, X1 = X1, X2 = X2, Sl = Sl, datalist = datalist, deriv = deriv)$root
-  beta <- nleqslv::nleqslv(x = start, fn = Score2, jac = Hessian, method = "Broyden", global = "hook",
-                           X1 = X1, X2 = X2, deriv = deriv, datalist = datalist, Sl = Sl)$x
-  H <- Hessian(coef.vector = beta, X1 = X1, X2 = X2, datalist = datalist, deriv = deriv)
+  beta <- nleqslv::nleqslv(x = start, fn = Score2, jac = Hessian,
+                           method = nleqslv.control()$method, global = nleqslv.control()$global,
+                           X1 = X1, X2 = X2, deriv = deriv, datalist = datalist, Sl = Sl, weights = weights)$x
+  H <- Hessian(coef.vector = beta, X1 = X1, X2 = X2, datalist = datalist, deriv = deriv, weights = weights)
   fit <-  wrapper2(coef.vector = beta,
                   X1 = X1, X2 = X2,
                   Sl = Sl, H = H,
                   minusLogLik = FALSE,
+                  weights = weights,
                   datalist = datalist)
 
   return(list(beta = beta, hessian = H, REML = fit$REML, ll = fit$ll, deriv = deriv))

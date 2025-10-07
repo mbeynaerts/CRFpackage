@@ -11,7 +11,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // IndGreater
-NumericMatrix IndGreater(NumericVector& x);
+IntegerMatrix IndGreater(NumericVector& x);
 RcppExport SEXP _CRFpackage_IndGreater(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -22,7 +22,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // IndLess
-NumericMatrix IndLess(NumericVector& x);
+IntegerMatrix IndLess(NumericVector& x);
 RcppExport SEXP _CRFpackage_IndLess(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -33,7 +33,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // IndEqual
-NumericMatrix IndEqual(NumericVector& x);
+IntegerMatrix IndEqual(NumericVector& x);
 RcppExport SEXP _CRFpackage_IndEqual(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -70,7 +70,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // DeltaC
-NumericMatrix DeltaC(NumericVector& x, NumericVector& y);
+IntegerMatrix DeltaC(NumericVector& x, NumericVector& y);
 RcppExport SEXP _CRFpackage_DeltaC(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -82,8 +82,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // logLikC
-double logLikC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6);
-RcppExport SEXP _CRFpackage_logLikC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP) {
+double logLikC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6, const NumericVector w1, const NumericVector w2);
+RcppExport SEXP _CRFpackage_logLikC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP, SEXP w1SEXP, SEXP w2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -99,13 +99,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type I4(I4SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I5(I5SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I6(I6SEXP);
-    rcpp_result_gen = Rcpp::wrap(logLikC(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6));
+    Rcpp::traits::input_parameter< const NumericVector >::type w1(w1SEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type w2(w2SEXP);
+    rcpp_result_gen = Rcpp::wrap(logLikC(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6, w1, w2));
     return rcpp_result_gen;
 END_RCPP
 }
 // gradientC
-NumericVector gradientC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const int& df, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6);
-RcppExport SEXP _CRFpackage_gradientC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP dfSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP) {
+NumericVector gradientC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const int& df, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6, const NumericVector w1, const NumericVector w2);
+RcppExport SEXP _CRFpackage_gradientC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP dfSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP, SEXP w1SEXP, SEXP w2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -123,7 +125,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type I4(I4SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I5(I5SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I6(I6SEXP);
-    rcpp_result_gen = Rcpp::wrap(gradientC(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4, I5, I6));
+    Rcpp::traits::input_parameter< const NumericVector >::type w1(w1SEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type w2(w2SEXP);
+    rcpp_result_gen = Rcpp::wrap(gradientC(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4, I5, I6, w1, w2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -152,8 +156,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // hessianC
-NumericMatrix hessianC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const int& df, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4);
-RcppExport SEXP _CRFpackage_hessianC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP dfSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP) {
+NumericMatrix hessianC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const int& df, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector w1, const NumericVector w2);
+RcppExport SEXP _CRFpackage_hessianC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP dfSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP w1SEXP, SEXP w2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -169,7 +173,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type I2(I2SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I3(I3SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I4(I4SEXP);
-    rcpp_result_gen = Rcpp::wrap(hessianC(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4));
+    Rcpp::traits::input_parameter< const NumericVector >::type w1(w1SEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type w2(w2SEXP);
+    rcpp_result_gen = Rcpp::wrap(hessianC(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4, w1, w2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -203,10 +209,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CRFpackage_Ind2", (DL_FUNC) &_CRFpackage_Ind2, 4},
     {"_CRFpackage_risksetC", (DL_FUNC) &_CRFpackage_risksetC, 2},
     {"_CRFpackage_DeltaC", (DL_FUNC) &_CRFpackage_DeltaC, 2},
-    {"_CRFpackage_logLikC", (DL_FUNC) &_CRFpackage_logLikC, 12},
-    {"_CRFpackage_gradientC", (DL_FUNC) &_CRFpackage_gradientC, 14},
+    {"_CRFpackage_logLikC", (DL_FUNC) &_CRFpackage_logLikC, 14},
+    {"_CRFpackage_gradientC", (DL_FUNC) &_CRFpackage_gradientC, 16},
     {"_CRFpackage_gradientPoly", (DL_FUNC) &_CRFpackage_gradientPoly, 14},
-    {"_CRFpackage_hessianC", (DL_FUNC) &_CRFpackage_hessianC, 12},
+    {"_CRFpackage_hessianC", (DL_FUNC) &_CRFpackage_hessianC, 14},
     {"_CRFpackage_hessianPolyC", (DL_FUNC) &_CRFpackage_hessianPolyC, 12},
     {NULL, NULL, 0}
 };

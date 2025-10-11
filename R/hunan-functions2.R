@@ -1045,9 +1045,9 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 }
 
 
-efsud.fit2 <- function(start, X1, X2, datalist, Sl, deriv.comp = NULL, control = nleqslv.control()) {
+efsud.fit2 <- function(start, X1, X2, datalist, Sl, weights, deriv.comp = NULL, control = nleqslv.control()) {
 
-  if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist, weights)
+  if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist, weights = weights)
   else deriv <- deriv.comp
 
   # beta <- multiroot(Score2, start = start, jacfunc = Hessian, jactype = "fullusr", rtol = 1e-10, X1 = X1, X2 = X2, Sl = Sl, datalist = datalist, deriv = deriv)$root

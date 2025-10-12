@@ -868,7 +868,7 @@ nleqslv.control <- function(method = "Broyden", global = "hook") {
 EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2), weights = NULL,
                            type = "ps", quantile = FALSE, scale = FALSE, repara = FALSE, step.control = FALSE,
                            control = efs.control(),
-                           nleqslv.control = nleqslv.control(),
+                           nl.control = nleqslv.control(),
                            verbose = TRUE) {
 
   if (verbose) print("Extended Fellner-Schall method:")
@@ -895,7 +895,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
                    # Sl = lambda.init*S
                    Sl = lambda.init[1]*S1 + lambda.init[2]*S2,
                    weights = weights,
-                   control = nleqslv.control)
+                   control = nl.control)
   k <- 1
   score <- rep(0, control$maxiter)
   for (iter in 1:control$maxiter) {
@@ -945,7 +945,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     Sl.new <- lambda.new[1]*S1 + lambda.new[2]*S2
     # Sl.new <- lambda.new*S
 
-    fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp, Sl = Sl.new, weights = weights, control = nleqslv.control)
+    fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp, Sl = Sl.new, weights = weights, control = nl.control)
     l1 <- fit$REML
 
     # Start of step control ----
@@ -958,7 +958,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
                             # Sl = lambda2*S
                             Sl = lambda2[1]*S1 + lambda2[2]*S2,
                             weights = weights,
-                            control = nleqslv.control)
+                            control = nl.control)
           l2 <- fit2$REML
           if (l2 > l1) { # Improvement - accept extension
             lambda.new <- lambda2
@@ -977,7 +977,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
                            # Sl = lambda3*S
                            Sl = lambda3[1]*S1 + lambda3[2]*S2,
                            weights = weights,
-                           control = nleqslv.control)
+                           control = nl.control)
           lk <- fit$REML
 
           # k <- k + 1

@@ -662,6 +662,10 @@ SimData <- function (K, cens.par = 0, alpha = c(3,5,1.5), weights = c(0.2,0.4,0.
   N1 <- c(t(N))
   N2 <- c(N)
 
+  # Row index of positive elements in riskset
+  idxN1 <- which(N1 > 0)
+  idxN2 <- which(N2 > 0)
+
 
   ## Calculating indicator functions in likelihood
 
@@ -703,16 +707,18 @@ SimData <- function (K, cens.par = 0, alpha = c(3,5,1.5), weights = c(0.2,0.4,0.
   return(list(X = X,
               idx = delta,
               # knots = cbind(knots1,knots2),
-              riskset1 = N1,
-              riskset2 = N2,
-              I1 = c(I1)[N1 > 0],
-              I2 = c(I2)[N1 > 0],
-              I3 = c(I3)[N2 > 0],
-              I4 = c(I4)[N2 > 0],
-              I5 = c(I5)[N1 > 0],
-              I6 = c(I6)[N2 > 0],
-              delta1 = delta.prod1[N1 > 0],
-              delta2 = delta.prod2[N2 > 0]))
+              idxN1 = idxN1,
+              idxN2 = idxN2,
+              riskset1 = N1[idxN1],
+              riskset2 = N2[idxN2],
+              I1 = c(I1)[idxN1],
+              I2 = c(I2)[idxN1],
+              I3 = c(I3)[idxN2],
+              I4 = c(I4)[idxN2],
+              I5 = c(I5)[idxN1],
+              I6 = c(I6)[idxN2],
+              delta1 = delta.prod1[idxN1],
+              delta2 = delta.prod2[idxN2]))
 }
 
 PrepareData <- function (t1, t2, cens1, cens2) {
@@ -837,14 +843,14 @@ wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLo
 
 
   logtheta <- WoodTensor(X1 = X1, X2 = X2, coef.vector = coef.vector)
-  logtheta1 <- c(t(logtheta))[datalist$riskset1 > 0]
-  logtheta2 <- c(logtheta)[datalist$riskset2 > 0]
+  logtheta1 <- c(t(logtheta))[datalist$idxN1]
+  logtheta2 <- c(logtheta)[datalist$idxN2]
 
-  w1 <- weights[datalist$riskset1 > 0]
-  w2 <- weights[datalist$riskset2 > 0]
+  w1 <- weights[datalist$idxN1]
+  w2 <- weights[datalist$idxN2]
 
-  L <- logLikC(riskset1 = datalist$riskset1[datalist$riskset1 > 0],
-               riskset2 = datalist$riskset2[datalist$riskset2 > 0],
+  L <- logLikC(riskset1 = datalist$riskset1,
+               riskset2 = datalist$riskset2,
                logtheta1 = logtheta1,
                logtheta2 = logtheta2,
                delta1 = datalist$delta1,

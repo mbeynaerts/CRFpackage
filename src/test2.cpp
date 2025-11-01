@@ -194,7 +194,8 @@ NumericVector gradientNew(const arma::colvec &riskset1,
 
   int K = X1.n_rows;
   int n = riskset1.size();
-  int totalparam = pow(X1.n_cols, 2);
+  int dim = X1.n_cols;
+  int totalparam = pow(dim, 2);
   NumericVector result(totalparam);
   arma::colvec common1(n);
   arma::colvec common2(n);
@@ -208,8 +209,8 @@ NumericVector gradientNew(const arma::colvec &riskset1,
 
   for (int m=0; m<totalparam; m++) {
 
-    int idx1 = totalparam % m;
-    int idx2 = totalparam / m;
+    int idx1 = m % dim;
+    int idx2 = m / dim;
 
     deriv_mat = arma::kron(X1.col(idx1), X2.col(idx2).as_row());
     deriv_mat_t = deriv_mat.t();
@@ -355,7 +356,8 @@ arma::mat hessianNew(const arma::colvec& riskset1,
 
   int K = X1.n_rows;
   int n = riskset1.n_rows;
-  int totalparam = pow(X1.n_cols, 2);
+  int dim = X1.n_cols;
+  int totalparam = pow(dim, 2);
   arma::colvec common1(n);
   arma::colvec common2(n);
 
@@ -373,16 +375,16 @@ arma::mat hessianNew(const arma::colvec& riskset1,
 
   for (int m = 0; m < totalparam; m++) {
 
-    int idx1 = totalparam % m;
-    int idx2 = totalparam / m;
+    int idx1 = m % dim;
+    int idx2 = m / dim;
 
     deriv_mat = arma::kron(X1.col(idx1), X2.col(idx2).as_row());
     deriv_mat_t = deriv_mat.t();
 
     for (int l = m; l < totalparam; l++) {
 
-      idx1 = totalparam % l;
-      idx2 = totalparam / l;
+      int idx1 = l % dim;
+      int idx2 = l / dim;
 
       deriv_mat_l = arma::kron(X1.col(idx1), X2.col(idx2).as_row());
       deriv_mat_l_t = deriv_mat_l.t();

@@ -105,8 +105,8 @@ double logLikC(const NumericVector &riskset1,
                const NumericVector &I4,
                const NumericVector &I5,
                const NumericVector &I6,
-               const NumericVector w1,
-               const NumericVector w2) {
+               const NumericVector &w1,
+               const NumericVector &w2) {
 
   double sum1;
   double sum2;
@@ -171,6 +171,59 @@ return(result);
 
 }
 
+// [[Rcpp::export]]
+NumericVector gradientNew(const arma::colvec &riskset1,
+                          const arma::colvec &riskset2,
+                          const arma::colvec &logtheta1,
+                          const arma::colvec &logtheta2,
+                          const arma::colvec &delta1,
+                          const arma::colvec &delta2,
+                          const arma::colvec &I1,
+                          const arma::colvec &I2,
+                          const arma::colvec &I3,
+                          const arma::colvec &I4,
+                          const arma::colvec &I5,
+                          const arma::colvec &I6,
+                          const arma::mat &X1,
+                          const arma::mat &X2,
+                          const arma::uvec &idxN1,
+                          const arma::uvec &idxN2,
+                          const arma::colvec& w1,
+                          const arma::colvec& w2) {
+
+  int K = X1.n_rows;
+  int n = riskset1.size();
+  int totalparam = pow(X1.n_cols, 2);
+  NumericVector result(totalparam);
+  arma::colvec common1(n);
+  arma::colvec common2(n);
+
+  common1 = w1 % delta1 % I1 % (I5 - I2 % arma::exp(logtheta1)/(riskset1 + I2 % arma::exp(logtheta1) - I2));
+  common2 = w2 % delta2 % I3 % (I6 - I4 % arma::exp(logtheta2)/(riskset2 + I4 % arma::exp(logtheta2) - I4));
+
+  arma::mat deriv_mat(K,K), deriv_mat_t(K,K);
+  arma::colvec deriv1(deriv_mat_t.memptr(), deriv_mat_t.n_elem, false, true);
+  arma::colvec deriv2(deriv_mat.memptr(), deriv_mat.n_elem, false, true);
+
+  for (int m=0; m<totalparam; m++) {
+
+    int idx1 = totalparam % m;
+    int idx2 = totalparam / m;
+
+    deriv_mat = arma::kron(X1.col(idx1), X2.col(idx2).as_row());
+    deriv_mat_t = deriv_mat.t();
+
+    double sum1 = arma::accu(common1 % deriv1.elem(idxN1));
+    double sum2 = arma::accu(common2 % deriv2.elem(idxN2));
+
+    result(m) = -sum1-sum2;
+
+  }
+
+  return(result);
+
+}
+
 
 // [[Rcpp::export]]
 NumericVector gradientPoly(const NumericVector &riskset1,
@@ -231,15 +284,15 @@ NumericMatrix hessianC(const NumericVector &riskset1,
                        const NumericVector &logtheta1,
                        const NumericVector &logtheta2,
                        const Rcpp::List &deriv,
-                       const int &df,
                        const NumericVector &delta1,
                        const NumericVector &delta2,
+                       const int df,
                        const NumericVector &I1,
                        const NumericVector &I2,
                        const NumericVector &I3,
                        const NumericVector &I4,
-                       const NumericVector w1,
-                       const NumericVector w2) {
+                       const NumericVector &w1,
+                       const NumericVector &w2) {
 
   int n = riskset1.length();
   int totalparam = df*df;
@@ -280,6 +333,71 @@ NumericMatrix hessianC(const NumericVector &riskset1,
 return(result);
 
 }
+
+// [[Rcpp::export]]
+arma::mat hessianNew(const arma::colvec& riskset1,
+                       const arma::colvec &riskset2,
+                       const arma::colvec &logtheta1,
+                       const arma::colvec &logtheta2,
+                       const arma::colvec &delta1,
+                       const arma::colvec &delta2,
+                       const arma::colvec &I1,
+                       const arma::colvec &I2,
+                       const arma::colvec &I3,
+                       const arma::colvec &I4,
+                       const arma::mat& X1,
+                       const arma::mat& X2,
+                       const arma::uvec& idxN1,
+                       const arma::uvec& idxN2,
+                       const arma::colvec& w1,
+                       const arma::colvec& w2) {
+
+  int K = X1.n_rows;
+  int n = riskset1.n_rows;
+  int totalparam = pow(X1.n_cols, 2);
+  arma::colvec common1(n);
+  arma::colvec common2(n);
+
+  arma::mat result(totalparam, totalparam);
+
+  common1 = -w1 % delta1 % I1 % (riskset1 - I2) % I2 % arma::exp(logtheta1) / arma::pow(riskset1 - I2 + I2 % arma::exp(logtheta1),2);
+  common2 = -w2 % delta2 % I3 % (riskset2 - I4) % I4 % arma::exp(logtheta2) / arma::pow(riskset2 - I4 + I4 % arma::exp(logtheta2),2);
+
+  arma::mat deriv_mat(K,K), deriv_mat_t(K,K), deriv_mat_l(K,K), deriv_mat_l_t(K,K);
+
+  arma::colvec deriv1m(deriv_mat_t.memptr(), deriv_mat_t.n_elem, false, true);
+  arma::colvec deriv2m(deriv_mat.memptr(), deriv_mat.n_elem, false, true);
+  arma::colvec deriv1l(deriv_mat_l_t.memptr(), deriv_mat_l_t.n_elem, false, true);
+  arma::colvec deriv2l(deriv_mat_l.memptr(), deriv_mat_l.n_elem, false, true);
+
+  for (int m = 0; m < totalparam; m++) {
+
+    int idx1 = totalparam % m;
+    int idx2 = totalparam / m;
+
+    deriv_mat = arma::kron(X1.col(idx1), X2.col(idx2).as_row());
+    deriv_mat_t = deriv_mat.t();
+
+    for (int l = m; l < totalparam; l++) {
+
+      idx1 = totalparam % l;
+      idx2 = totalparam / l;
+
+      deriv_mat_l = arma::kron(X1.col(idx1), X2.col(idx2).as_row());
+      deriv_mat_l_t = deriv_mat_l.t();
+
+      double sum1 = accu(common1 % deriv1m.elem(idxN1) % deriv1l.elem(idxN1));
+      double sum2 = accu(common2 % deriv2m.elem(idxN2) % deriv2l.elem(idxN2));
+
+      result(l,m) = -sum1-sum2;
+
+    }
+  }
+
+  return arma::symmatl(result);
+
+}
+
 
 // [[Rcpp::export]]
 NumericMatrix hessianPolyC(const NumericVector &riskset1,

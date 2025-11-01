@@ -403,32 +403,50 @@ deriv_comp_poly <- function(datalist) {
 # }
 #
 
-Hessian <- function (coef.vector, X1, X2, Sl = NULL, deriv, datalist, weights) {
+Hessian <- function (coef.vector, X1, X2, Sl = NULL, datalist, weights) {
 
-  df <- ncol(X1)
+  # df <- ncol(X1)
 
   # Tensor product spline
   logtheta <- WoodTensor(X1, X2, coef.vector = coef.vector)
-  logtheta2 <- c(logtheta)[datalist$riskset2 > 0]
-  logtheta1 <- c(t(logtheta))[datalist$riskset1 > 0]
+  logtheta2 <- c(logtheta)[datalist$idxN2]
+  logtheta1 <- c(t(logtheta))[datalist$idxN1]
+  rm(logtheta)
 
-  w1 <- weights[datalist$riskset1 > 0]
-  w2 <- weights[datalist$riskset2 > 0]
+  w1 <- weights[datalist$idxN1]
+  w2 <- weights[datalist$idxN2]
 
-  hessian <- hessianC(riskset1 = datalist$riskset1[datalist$riskset1>0],
-                      riskset2 = datalist$riskset2[datalist$riskset2>0],
-                      logtheta1 = logtheta1,
-                      logtheta2 = logtheta2,
-                      deriv = deriv,
-                      df = df,
-                      delta1 = datalist$delta1,
-                      delta2 = datalist$delta2,
-                      I1 = datalist$I1,
-                      I2 = datalist$I2,
-                      I3 = datalist$I3,
-                      I4 = datalist$I4,
-                      w1 = w1,
-                      w2 = w2)
+  # hessian <- hessianC(riskset1 = datalist$riskset1,
+  #                     riskset2 = datalist$riskset2,
+  #                     logtheta1 = logtheta1,
+  #                     logtheta2 = logtheta2,
+  #                     deriv = deriv,
+  #                     df = df,
+  #                     delta1 = datalist$delta1,
+  #                     delta2 = datalist$delta2,
+  #                     I1 = datalist$I1,
+  #                     I2 = datalist$I2,
+  #                     I3 = datalist$I3,
+  #                     I4 = datalist$I4,
+  #                     w1 = w1,
+  #                     w2 = w2)
+
+  hessian <- hessianNew(riskset1 = datalist$riskset1,
+                        riskset2 = datalist$riskset2,
+                        logtheta1 = logtheta1,
+                        logtheta2 = logtheta2,
+                        delta1 = datalist$delta1,
+                        delta2 = datalist$delta2,
+                        I1 = datalist$I1,
+                        I2 = datalist$I2,
+                        I3 = datalist$I3,
+                        I4 = datalist$I4,
+                        X1 = X1,
+                        X2 = X2,
+                        idxN1 = datalist$idxN1 - 1,
+                        idxN2 = datalist$idxN2 - 1,
+                        w1 = w1,
+                        w2 = w2)
 
   if (!is.null(Sl)) hessian <- hessian + Sl
 
@@ -459,37 +477,55 @@ HessianPoly <- function(beta, datalist, deriv) {
 }
 
 
-Score2 <- function(coef.vector, X1, X2, datalist, deriv, Sl = NULL, weights) {
+Score2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, weights) {
 
   # Tensor product spline
   logtheta <- WoodTensor(X1, X2, coef.vector = coef.vector)
-  logtheta1 <- c(t(logtheta))[datalist$riskset1 > 0]
-  logtheta2 <- c(logtheta)[datalist$riskset2 > 0]
+  logtheta1 <- c(t(logtheta))[datalist$idxN1]
+  logtheta2 <- c(logtheta)[datalist$idxN2]
 
-  N1 <- datalist$riskset1[datalist$riskset1 > 0]
-  N2 <- datalist$riskset2[datalist$riskset2 > 0]
+  # N1 <- datalist$riskset1[datalist$riskset1 > 0]
+  # N2 <- datalist$riskset2[datalist$riskset2 > 0]
 
-  w1 <- weights[datalist$riskset1 > 0]
-  w2 <- weights[datalist$riskset2 > 0]
+  w1 <- weights[datalist$idxN1]
+  w2 <- weights[datalist$idxN2]
 
-  df <- ncol(X1)
 
-  gradient <- gradientC(riskset1 = N1,
-                        riskset2 = N2,
-                        logtheta1 = logtheta1,
-                        logtheta2 = logtheta2,
-                        df = df,
-                        deriv = deriv,
-                        delta1 = datalist$delta1,
-                        delta2 = datalist$delta2,
-                        I1 = datalist$I1,
-                        I2 = datalist$I2,
-                        I3 = datalist$I3,
-                        I4 = datalist$I4,
-                        I5 = datalist$I5,
-                        I6 = datalist$I6,
-                        w1 = w1,
-                        w2 = w2) # gradientC returns vector of derivatives of -loglik
+  # gradient <- gradientC(riskset1 = N1,
+  #                       riskset2 = N2,
+  #                       logtheta1 = logtheta1,
+  #                       logtheta2 = logtheta2,
+  #                       df = df,
+  #                       deriv = deriv,
+  #                       delta1 = datalist$delta1,
+  #                       delta2 = datalist$delta2,
+  #                       I1 = datalist$I1,
+  #                       I2 = datalist$I2,
+  #                       I3 = datalist$I3,
+  #                       I4 = datalist$I4,
+  #                       I5 = datalist$I5,
+  #                       I6 = datalist$I6,
+  #                       w1 = w1,
+  #                       w2 = w2) # gradientC returns vector of derivatives of -loglik
+
+  gradient <- gradientNew(riskset1 = datalist$riskset1,
+                          riskset2 = datalist$riskset2,
+                          logtheta1 = logtheta1,
+                          logtheta2 = logtheta2,
+                          delta1 = datalist$delta1,
+                          delta2 = datalist$delta2,
+                          I1 = datalist$I1,
+                          I2 = datalist$I2,
+                          I3 = datalist$I3,
+                          I4 = datalist$I4,
+                          I5 = datalist$I5,
+                          I6 = datalist$I6,
+                          X1 = X1,
+                          X2 = X2,
+                          idxN1 = datalist$idxN1 - 1,
+                          idxN2 = datalist$idxN2 - 1,
+                          w1 = w1,
+                          w2 = w2) # gradientC returns vector of derivatives of -loglik
 
   if (!is.null(Sl)) penalty <- t(coef.vector) %*% Sl
   else penalty <- 0
@@ -718,6 +754,10 @@ PrepareData <- function (t1, t2, cens1, cens2) {
   N1 <- c(t(N))
   N2 <- c(N)
 
+  # Row index of positive elements in riskset
+  idxN1 <- which(N1 > 0)
+  idxN2 <- which(N2 > 0)
+
 
   ## Calculating indicator functions in likelihood
 
@@ -758,8 +798,10 @@ PrepareData <- function (t1, t2, cens1, cens2) {
 
   return(list(X = X,
               idx = delta,
-              riskset1 = N1,
-              riskset2 = N2,
+              idxN1 = idxN1,
+              idxN2 = idxN2,
+              riskset1 = N1[N1>0],
+              riskset2 = N2[N2>0],
               I1 = c(I1)[N1 > 0],
               I2 = c(I2)[N1 > 0],
               I3 = c(I3)[N2 > 0],
@@ -880,18 +922,15 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
   obj1 <- WoodSpline(t = datalist$X[,1], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile, knot.margin = control$knot.margin)
   obj2 <- WoodSpline(t = datalist$X[,2], dim = dim, degree = degree, type = type, scale = scale, repara = repara, quantile = quantile, knot.margin = control$knot.margin)
 
-  X1 <- obj1$X
-  X2 <- obj2$X
-
   S <- WoodPenalty(obj1,obj2)
   S1 <- S[[1]]
   S2 <- S[[2]]
 
   lambda.new <- lambda.init # In voorbeelden van Wood (2017) is de initiele lambda = 1
 
-  deriv.comp <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist)
+  # deriv.comp <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist)
 
-  fit <- efsud.fit2(start = start, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp,
+  fit <- efsud.fit2(start = start, X1 = obj1$X, X2 = obj2$X, datalist = datalist,
                    # Sl = lambda.init*S
                    Sl = lambda.init[1]*S1 + lambda.init[2]*S2,
                    weights = weights,
@@ -945,7 +984,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     Sl.new <- lambda.new[1]*S1 + lambda.new[2]*S2
     # Sl.new <- lambda.new*S
 
-    fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist, deriv.comp = deriv.comp, Sl = Sl.new, weights = weights, control = nl.control)
+    fit <- efsud.fit2(start = fit$beta, X1 = obj1$X, X2 = obj2$X, datalist = datalist, Sl = Sl.new, weights = weights, control = nl.control)
     l1 <- fit$REML
 
     # Start of step control ----
@@ -954,7 +993,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
       if (l1 > l0) { # Improvement
         if(max.step < 1) { # Consider step extension
           lambda2 <- pmin(lambda*update^(k*2), exp(12))
-          fit2 <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist,
+          fit2 <- efsud.fit2(start = fit$beta, X1 = obj1$X, X2 = obj2$X, datalist = datalist,
                             # Sl = lambda2*S
                             Sl = lambda2[1]*S1 + lambda2[2]*S2,
                             weights = weights,
@@ -973,7 +1012,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
         while (lk < l0 && k > 1) { # Don't contract too much since the likelihood does not need to increase k > 0.001
           k <- k/2 ## Contract step
           lambda3 <- pmin(lambda*update^k, control$lambda.max)
-          fit <- efsud.fit2(start = fit$beta, X1 = X1, X2 = X2, datalist = datalist,
+          fit <- efsud.fit2(start = fit$beta, X1 = obj$X1, X2 = obj$X2, datalist = datalist,
                            # Sl = lambda3*S
                            Sl = lambda3[1]*S1 + lambda3[2]*S2,
                            weights = weights,
@@ -1045,21 +1084,21 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 }
 
 
-efsud.fit2 <- function(start, X1, X2, datalist, Sl, weights, deriv.comp = NULL, control = nleqslv.control()) {
+efsud.fit2 <- function(start, X1, X2, datalist, Sl, weights, control = nleqslv.control()) {
 
-  if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist, weights = weights)
-  else deriv <- deriv.comp
+  # if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist, weights = weights)
+  # else deriv <- deriv.comp
 
   # beta <- multiroot(Score2, start = start, jacfunc = Hessian, jactype = "fullusr", rtol = 1e-10, X1 = X1, X2 = X2, Sl = Sl, datalist = datalist, deriv = deriv)$root
   estim <- nleqslv::nleqslv(x = start, fn = Score2, jac = Hessian,
                             method = control$method, global = control$global,
-                            X1 = X1, X2 = X2, deriv = deriv, datalist = datalist, Sl = Sl, weights = weights)
+                            X1 = X1, X2 = X2, datalist = datalist, Sl = Sl, weights = weights)
   beta <- estim$x
   if(any(is.na(beta))) {
     estim
     stop("One of the spline coefficients is NA")
   }
-  H <- Hessian(coef.vector = beta, X1 = X1, X2 = X2, datalist = datalist, deriv = deriv, weights = weights)
+  H <- Hessian(coef.vector = beta, X1 = X1, X2 = X2, datalist = datalist, weights = weights)
   fit <-  wrapper2(coef.vector = beta,
                   X1 = X1, X2 = X2,
                   Sl = Sl, H = H,
@@ -1067,7 +1106,7 @@ efsud.fit2 <- function(start, X1, X2, datalist, Sl, weights, deriv.comp = NULL, 
                   weights = weights,
                   datalist = datalist)
 
-  return(list(beta = beta, hessian = H, REML = fit$REML, ll = fit$ll, deriv = deriv, info = estim))
+  return(list(beta = beta, hessian = H, REML = fit$REML, ll = fit$ll, info = estim))
 }
 
 EstimatePoly <- function(start = rep(0,10), datalist) {

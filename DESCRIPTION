@@ -16,6 +16,8 @@ Imports:
   mgcv,
   nleqslv,
   copula
-LinkingTo: Rcpp
+LinkingTo:
+  Rcpp,
+  RcppArmadillo
 URL: https://github.com/MiguelB147/CRFpackage
 BugReports: https://github.com/MiguelB147/CRFpackage/issues

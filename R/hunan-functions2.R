@@ -1,27 +1,27 @@
-row.kronecker <- function(X, Y){
-    ### row-wise kronecker product
-    ### Nathaniel E. Helwig (helwig@umn.edu)
-    ### Aug 6, 2023
-
-    nx <- nrow(X)
-    ny <- nrow(Y)
-    if(nx != ny) stop("Inputs 'X' and 'Y' must have the same number of rows")
-    px <- ncol(X)
-    py <- ncol(Y)
-    xnames <- colnames(X)
-    if(is.null(xnames)) xnames <- paste0("X", 1:px)
-    ynames <- colnames(Y)
-    if(is.null(ynames)) ynames <- paste0("Y", 1:py)
-    znames <- NULL
-    Z <- matrix(0.0, nrow = nx, ncol = px * py)
-    for(j in 1:px){
-      index <- 1:py + (j - 1) * py
-      Z[,index] <- X[,j] * Y
-      znames <- c(znames, paste0(xnames[j], ":", ynames))
-    }
-    colnames(Z) <- znames
-    return(Z)
-  }
+# row.kronecker <- function(X, Y){
+#     ### row-wise kronecker product
+#     ### Nathaniel E. Helwig (helwig@umn.edu)
+#     ### Aug 6, 2023
+#
+#     nx <- nrow(X)
+#     ny <- nrow(Y)
+#     if(nx != ny) stop("Inputs 'X' and 'Y' must have the same number of rows")
+#     px <- ncol(X)
+#     py <- ncol(Y)
+#     xnames <- colnames(X)
+#     if(is.null(xnames)) xnames <- paste0("X", 1:px)
+#     ynames <- colnames(Y)
+#     if(is.null(ynames)) ynames <- paste0("Y", 1:py)
+#     znames <- NULL
+#     Z <- matrix(0.0, nrow = nx, ncol = px * py)
+#     for(j in 1:px){
+#       index <- 1:py + (j - 1) * py
+#       Z[,index] <- X[,j] * Y
+#       znames <- c(znames, paste0(xnames[j], ":", ynames))
+#     }
+#     colnames(Z) <- znames
+#     return(Z)
+#   }
 
 theta.frank <- function(x,y,alpha=0.0023) {
   A <- (alpha-1)*log(alpha)*alpha^(2-exp(-x)-exp(-y))
@@ -284,7 +284,7 @@ WoodTensor.predict <- function(t1, t2, fit, logCRF = TRUE) {
   }
 
   # Model matrix
-  X <- row.kronecker(X1,X2)
+  X <- row_kron(X1,X2)
   spline <- X %*% fit$beta
 
   # Calculate standard error of log(theta)

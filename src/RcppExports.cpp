@@ -11,6 +11,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// row_kron
+arma::mat row_kron(const arma::mat& X, const arma::mat& Y);
+RcppExport SEXP _CRFpackage_row_kron(SEXP XSEXP, SEXP YSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
+    rcpp_result_gen = Rcpp::wrap(row_kron(X, Y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // IndGreater
 IntegerMatrix IndGreater(NumericVector& x);
 RcppExport SEXP _CRFpackage_IndGreater(SEXP xSEXP) {
@@ -258,6 +270,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_CRFpackage_row_kron", (DL_FUNC) &_CRFpackage_row_kron, 2},
     {"_CRFpackage_IndGreater", (DL_FUNC) &_CRFpackage_IndGreater, 1},
     {"_CRFpackage_IndLess", (DL_FUNC) &_CRFpackage_IndLess, 1},
     {"_CRFpackage_IndEqual", (DL_FUNC) &_CRFpackage_IndEqual, 1},

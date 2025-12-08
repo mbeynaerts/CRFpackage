@@ -931,7 +931,6 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
   fit <- efsud.fit2(start = start, X1 = obj1$X, X2 = obj2$X, datalist = datalist,
                    # Sl = lambda.init*S
                    Sl = lambda.init[1]*S1 + lambda.init[2]*S2,
-                   # weights = weights,
                    control = nl.control)
   k <- 1
   score <- rep(0, control$maxiter)
@@ -982,7 +981,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
     Sl.new <- lambda.new[1]*S1 + lambda.new[2]*S2
     # Sl.new <- lambda.new*S
 
-    fit <- efsud.fit2(start = fit$beta, X1 = obj1$X, X2 = obj2$X, datalist = datalist, Sl = Sl.new, weights = weights, control = nl.control)
+    fit <- efsud.fit2(start = fit$beta, X1 = obj1$X, X2 = obj2$X, datalist = datalist, Sl = Sl.new, control = nl.control)
     l1 <- fit$REML
 
     # Start of step control ----

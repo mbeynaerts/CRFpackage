@@ -904,7 +904,8 @@ nleqslv.control <- function(method = "Broyden", global = "hook") {
 
 # EFS gebaseerd op de code van Simon Wood in het mgcv package (zie gam.fit4.r op github)
 # gam.control() details in mgcv.r op github
-EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2), weights = NULL,
+EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), start = rep(1,dim^2),
+                           # weights = NULL,
                            type = "ps", quantile = FALSE, scale = FALSE, repara = FALSE, step.control = FALSE,
                            control = efs.control(),
                            nl.control = nleqslv.control(),
@@ -912,7 +913,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 
   if (verbose) print("Extended Fellner-Schall method:")
 
-  if (is.null(weights)) weights <- rep(1, length(datalist$riskset1))
+  # if (is.null(weights)) weights <- rep(1, length(datalist$riskset1))
 
   tiny <- .Machine$double.eps^0.5
 
@@ -930,7 +931,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
   fit <- efsud.fit2(start = start, X1 = obj1$X, X2 = obj2$X, datalist = datalist,
                    # Sl = lambda.init*S
                    Sl = lambda.init[1]*S1 + lambda.init[2]*S2,
-                   weights = weights,
+                   # weights = weights,
                    control = nl.control)
   k <- 1
   score <- rep(0, control$maxiter)
@@ -993,7 +994,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
           fit2 <- efsud.fit2(start = fit$beta, X1 = obj1$X, X2 = obj2$X, datalist = datalist,
                             # Sl = lambda2*S
                             Sl = lambda2[1]*S1 + lambda2[2]*S2,
-                            weights = weights,
+                            # weights = weights,
                             control = nl.control)
           l2 <- fit2$REML
           if (l2 > l1) { # Improvement - accept extension
@@ -1012,7 +1013,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
           fit <- efsud.fit2(start = fit$beta, X1 = obj$X1, X2 = obj$X2, datalist = datalist,
                            # Sl = lambda3*S
                            Sl = lambda3[1]*S1 + lambda3[2]*S2,
-                           weights = weights,
+                           # weights = weights,
                            control = nl.control)
           lk <- fit$REML
 
@@ -1081,7 +1082,7 @@ EstimatePenal2 <- function(datalist, dim, degree = 3, lambda.init = c(1,1), star
 }
 
 
-efsud.fit2 <- function(start, X1, X2, datalist, Sl, weights, control = nleqslv.control()) {
+efsud.fit2 <- function(start, X1, X2, datalist, Sl, control = nleqslv.control()) {
 
   # if (is.null(deriv.comp)) deriv <- deriv_comp(X1 = X1, X2 = X2, datalist = datalist, weights = weights)
   # else deriv <- deriv.comp
@@ -1089,18 +1090,17 @@ efsud.fit2 <- function(start, X1, X2, datalist, Sl, weights, control = nleqslv.c
   # beta <- multiroot(Score2, start = start, jacfunc = Hessian, jactype = "fullusr", rtol = 1e-10, X1 = X1, X2 = X2, Sl = Sl, datalist = datalist, deriv = deriv)$root
   estim <- nleqslv::nleqslv(x = start, fn = Score2, jac = Hessian,
                             method = control$method, global = control$global,
-                            X1 = X1, X2 = X2, datalist = datalist, Sl = Sl, weights = weights)
+                            X1 = X1, X2 = X2, datalist = datalist, Sl = Sl)
   beta <- estim$x
   if(any(is.na(beta))) {
     estim
     stop("One of the spline coefficients is NA")
   }
-  H <- Hessian(coef.vector = beta, X1 = X1, X2 = X2, datalist = datalist, weights = weights)
+  H <- Hessian(coef.vector = beta, X1 = X1, X2 = X2, datalist = datalist)
   fit <-  wrapper2(coef.vector = beta,
                   X1 = X1, X2 = X2,
                   Sl = Sl, H = H,
                   minusLogLik = FALSE,
-                  weights = weights,
                   datalist = datalist)
 
   return(list(beta = beta, hessian = H, REML = fit$REML, ll = fit$ll, info = estim))

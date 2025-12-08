@@ -470,7 +470,7 @@ HessianPoly <- function(beta, datalist, deriv) {
 }
 
 
-Score2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, weights) {
+Score2 <- function(coef.vector, X1, X2, datalist, Sl = NULL) {
 
   # Tensor product spline
   logtheta <- WoodTensor(X1, X2, coef.vector = coef.vector)
@@ -809,7 +809,7 @@ PrepareData <- function (t1, t2, cens1, cens2) {
               delta2 = delta.prod2[N2 > 0]))
 }
 
-wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLogLik=TRUE, weights) { # H is hier gewoon de unpenalized hessian
+wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLogLik=TRUE) { # H is hier gewoon de unpenalized hessian
 
   # Check whether penalty is applied
   if (is.null(Sl)) {

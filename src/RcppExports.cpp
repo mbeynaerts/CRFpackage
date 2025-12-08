@@ -95,8 +95,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // logLikC
-double logLikC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6, const NumericVector& w1, const NumericVector& w2);
-RcppExport SEXP _CRFpackage_logLikC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP, SEXP w1SEXP, SEXP w2SEXP) {
+double logLikC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6);
+RcppExport SEXP _CRFpackage_logLikC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -112,9 +112,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type I4(I4SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I5(I5SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I6(I6SEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type w1(w1SEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type w2(w2SEXP);
-    rcpp_result_gen = Rcpp::wrap(logLikC(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6, w1, w2));
+    rcpp_result_gen = Rcpp::wrap(logLikC(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -269,7 +267,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CRFpackage_Ind2", (DL_FUNC) &_CRFpackage_Ind2, 4},
     {"_CRFpackage_risksetC", (DL_FUNC) &_CRFpackage_risksetC, 2},
     {"_CRFpackage_DeltaC", (DL_FUNC) &_CRFpackage_DeltaC, 2},
-    {"_CRFpackage_logLikC", (DL_FUNC) &_CRFpackage_logLikC, 14},
+    {"_CRFpackage_logLikC", (DL_FUNC) &_CRFpackage_logLikC, 12},
     {"_CRFpackage_gradientC", (DL_FUNC) &_CRFpackage_gradientC, 14},
     {"_CRFpackage_gradientNew", (DL_FUNC) &_CRFpackage_gradientNew, 16},
     {"_CRFpackage_gradientPoly", (DL_FUNC) &_CRFpackage_gradientPoly, 14},

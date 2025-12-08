@@ -29,8 +29,8 @@ DeltaC <- function(x, y) {
     .Call(`_CRFpackage_DeltaC`, x, y)
 }
 
-logLikC <- function(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6, w1, w2) {
-    .Call(`_CRFpackage_logLikC`, riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6, w1, w2)
+logLikC <- function(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6) {
+    .Call(`_CRFpackage_logLikC`, riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6)
 }
 
 gradientC <- function(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4, I5, I6) {

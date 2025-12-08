@@ -307,13 +307,13 @@ deriv_comp <- function(X1, X2, datalist) {
   N1 <- datalist$riskset1
   N2 <- datalist$riskset2
 
-  nrows <- sum(N1>0)
+  nrows <- length(N1)
 
   deriv <- apply(M, 2,
                  function(m) {A <- matrix(NA, ncol = 2, nrow = nrows)
                               X <- WoodTensor(coef.vector = m, X1 = X1, X2 = X2)
-                              A[,1] <- c(t(X))[N1 > 0]
-                              A[,2] <- c(X)[N2 > 0]
+                              A[,1] <- c(t(X))[datalist$idxN1]
+                              A[,2] <- c(X)[datalist$idxN2]
                               return(A) },
                  simplify = FALSE
                  )
@@ -403,7 +403,7 @@ deriv_comp_poly <- function(datalist) {
 # }
 #
 
-Hessian <- function (coef.vector, X1, X2, Sl = NULL, datalist, weights) {
+Hessian <- function (coef.vector, X1, X2, Sl = NULL, datalist) {
 
   # df <- ncol(X1)
 
@@ -413,10 +413,7 @@ Hessian <- function (coef.vector, X1, X2, Sl = NULL, datalist, weights) {
   logtheta1 <- c(t(logtheta))[datalist$idxN1]
   rm(logtheta)
 
-  w1 <- weights[datalist$idxN1]
-  w2 <- weights[datalist$idxN2]
-
-  # hessian <- hessianC(riskset1 = datalist$riskset1,
+  # hessianold <- hessianC(riskset1 = datalist$riskset1,
   #                     riskset2 = datalist$riskset2,
   #                     logtheta1 = logtheta1,
   #                     logtheta2 = logtheta2,
@@ -427,9 +424,7 @@ Hessian <- function (coef.vector, X1, X2, Sl = NULL, datalist, weights) {
   #                     I1 = datalist$I1,
   #                     I2 = datalist$I2,
   #                     I3 = datalist$I3,
-  #                     I4 = datalist$I4,
-  #                     w1 = w1,
-  #                     w2 = w2)
+  #                     I4 = datalist$I4)
 
   hessian <- hessianNew(riskset1 = datalist$riskset1,
                         riskset2 = datalist$riskset2,
@@ -444,9 +439,7 @@ Hessian <- function (coef.vector, X1, X2, Sl = NULL, datalist, weights) {
                         X1 = X1,
                         X2 = X2,
                         idxN1 = datalist$idxN1 - 1,
-                        idxN2 = datalist$idxN2 - 1,
-                        w1 = w1,
-                        w2 = w2)
+                        idxN2 = datalist$idxN2 - 1)
 
   if (!is.null(Sl)) hessian <- hessian + Sl
 
@@ -484,15 +477,17 @@ Score2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, weights) {
   logtheta1 <- c(t(logtheta))[datalist$idxN1]
   logtheta2 <- c(logtheta)[datalist$idxN2]
 
+  rm(logtheta)
+
   # N1 <- datalist$riskset1[datalist$riskset1 > 0]
   # N2 <- datalist$riskset2[datalist$riskset2 > 0]
 
-  w1 <- weights[datalist$idxN1]
-  w2 <- weights[datalist$idxN2]
+  # w1 <- weights[datalist$idxN1]
+  # w2 <- weights[datalist$idxN2]
 
 
-  # gradient <- gradientC(riskset1 = N1,
-  #                       riskset2 = N2,
+  # gradientold <- gradientC(riskset1 = datalist$riskset1,
+  #                       riskset2 = datalist$riskset2,
   #                       logtheta1 = logtheta1,
   #                       logtheta2 = logtheta2,
   #                       df = df,
@@ -504,9 +499,7 @@ Score2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, weights) {
   #                       I3 = datalist$I3,
   #                       I4 = datalist$I4,
   #                       I5 = datalist$I5,
-  #                       I6 = datalist$I6,
-  #                       w1 = w1,
-  #                       w2 = w2) # gradientC returns vector of derivatives of -loglik
+  #                       I6 = datalist$I6) # gradientC returns vector of derivatives of -loglik
 
   gradient <- gradientNew(riskset1 = datalist$riskset1,
                           riskset2 = datalist$riskset2,
@@ -523,9 +516,7 @@ Score2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, weights) {
                           X1 = X1,
                           X2 = X2,
                           idxN1 = datalist$idxN1 - 1,
-                          idxN2 = datalist$idxN2 - 1,
-                          w1 = w1,
-                          w2 = w2) # gradientC returns vector of derivatives of -loglik
+                          idxN2 = datalist$idxN2 - 1) # gradientC returns vector of derivatives of -loglik
 
   if (!is.null(Sl)) penalty <- t(coef.vector) %*% Sl
   else penalty <- 0
@@ -569,18 +560,18 @@ SimData <- function (K, cens.par = 0, alpha = c(3,5,1.5), weights = c(0.2,0.4,0.
 
   U <- copula::rCopula(K, mx)
 
-  # if(margin == "exp") {
-  #   T1 <- -log(U[,1])
-  #   T2 <- -log(U[,2])
-  # } else if (margin == "unif") {
-  #   T1 <- 5*(1-U[,1])
-  #   T2 <- 5*(1-U[,2])
-  # }
+  if(margin == "exp") {
+    T1 <- -log(U[,1])
+    T2 <- -log(U[,2])
+  } else if (margin == "unif") {
+    T1 <- 5*(1-U[,1])
+    T2 <- 5*(1-U[,2])
+  }
 
-  margin_dist <- paste0("q", margin)
+  # margin_dist <- paste0("q", margin)
 
-  T1 <- get(margin_dist)(p = U[,1], lower.tail = FALSE, ...)
-  T2 <- get(margin_dist)(p = U[,2], lower.tail = FALSE, ...)
+  # T1 <- get(margin_dist)(p = U[,1], lower.tail = FALSE, ...)
+  # T2 <- get(margin_dist)(p = U[,2], lower.tail = FALSE, ...)
 
 
   if (cens.par > 0) {
@@ -846,8 +837,10 @@ wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLo
   logtheta1 <- c(t(logtheta))[datalist$idxN1]
   logtheta2 <- c(logtheta)[datalist$idxN2]
 
-  w1 <- weights[datalist$idxN1]
-  w2 <- weights[datalist$idxN2]
+  rm(logtheta)
+
+  # w1 <- weights[datalist$idxN1]
+  # w2 <- weights[datalist$idxN2]
 
   L <- logLikC(riskset1 = datalist$riskset1,
                riskset2 = datalist$riskset2,
@@ -860,9 +853,7 @@ wrapper2 <- function(coef.vector, X1, X2, datalist, Sl = NULL, H = NULL, minusLo
                I3 = datalist$I3,
                I4 = datalist$I4,
                I5 = datalist$I5,
-               I6 = datalist$I6,
-               w1 = w1,
-               w2 = w2)
+               I6 = datalist$I6)
 
 
   ll <- L + penaltyLik/2

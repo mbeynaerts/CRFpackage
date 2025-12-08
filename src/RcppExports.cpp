@@ -119,8 +119,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // gradientC
-NumericVector gradientC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const int& df, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6, const NumericVector w1, const NumericVector w2);
-RcppExport SEXP _CRFpackage_gradientC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP dfSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP, SEXP w1SEXP, SEXP w2SEXP) {
+NumericVector gradientC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const int& df, const NumericVector& delta1, const NumericVector& delta2, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& I5, const NumericVector& I6);
+RcppExport SEXP _CRFpackage_gradientC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP dfSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -138,15 +138,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type I4(I4SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I5(I5SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I6(I6SEXP);
-    Rcpp::traits::input_parameter< const NumericVector >::type w1(w1SEXP);
-    Rcpp::traits::input_parameter< const NumericVector >::type w2(w2SEXP);
-    rcpp_result_gen = Rcpp::wrap(gradientC(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4, I5, I6, w1, w2));
+    rcpp_result_gen = Rcpp::wrap(gradientC(riskset1, riskset2, logtheta1, logtheta2, deriv, df, delta1, delta2, I1, I2, I3, I4, I5, I6));
     return rcpp_result_gen;
 END_RCPP
 }
 // gradientNew
-NumericVector gradientNew(const arma::colvec& riskset1, const arma::colvec& riskset2, const arma::colvec& logtheta1, const arma::colvec& logtheta2, const arma::colvec& delta1, const arma::colvec& delta2, const arma::colvec& I1, const arma::colvec& I2, const arma::colvec& I3, const arma::colvec& I4, const arma::colvec& I5, const arma::colvec& I6, const arma::mat& X1, const arma::mat& X2, const arma::uvec& idxN1, const arma::uvec& idxN2, const arma::colvec& w1, const arma::colvec& w2);
-RcppExport SEXP _CRFpackage_gradientNew(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP, SEXP X1SEXP, SEXP X2SEXP, SEXP idxN1SEXP, SEXP idxN2SEXP, SEXP w1SEXP, SEXP w2SEXP) {
+NumericVector gradientNew(const arma::colvec& riskset1, const arma::colvec& riskset2, const arma::colvec& logtheta1, const arma::colvec& logtheta2, const arma::colvec& delta1, const arma::colvec& delta2, const arma::colvec& I1, const arma::colvec& I2, const arma::colvec& I3, const arma::colvec& I4, const arma::colvec& I5, const arma::colvec& I6, const arma::mat& X1, const arma::mat& X2, const arma::uvec& idxN1, const arma::uvec& idxN2);
+RcppExport SEXP _CRFpackage_gradientNew(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP I5SEXP, SEXP I6SEXP, SEXP X1SEXP, SEXP X2SEXP, SEXP idxN1SEXP, SEXP idxN2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -166,9 +164,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat& >::type X2(X2SEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type idxN1(idxN1SEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type idxN2(idxN2SEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type w1(w1SEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type w2(w2SEXP);
-    rcpp_result_gen = Rcpp::wrap(gradientNew(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6, X1, X2, idxN1, idxN2, w1, w2));
+    rcpp_result_gen = Rcpp::wrap(gradientNew(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, I5, I6, X1, X2, idxN1, idxN2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -197,8 +193,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // hessianC
-NumericMatrix hessianC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const NumericVector& delta1, const NumericVector& delta2, const int df, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4, const NumericVector& w1, const NumericVector& w2);
-RcppExport SEXP _CRFpackage_hessianC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP dfSEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP w1SEXP, SEXP w2SEXP) {
+NumericMatrix hessianC(const NumericVector& riskset1, const NumericVector& riskset2, const NumericVector& logtheta1, const NumericVector& logtheta2, const Rcpp::List& deriv, const NumericVector& delta1, const NumericVector& delta2, const int df, const NumericVector& I1, const NumericVector& I2, const NumericVector& I3, const NumericVector& I4);
+RcppExport SEXP _CRFpackage_hessianC(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP derivSEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP dfSEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -214,15 +210,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type I2(I2SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I3(I3SEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type I4(I4SEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type w1(w1SEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type w2(w2SEXP);
-    rcpp_result_gen = Rcpp::wrap(hessianC(riskset1, riskset2, logtheta1, logtheta2, deriv, delta1, delta2, df, I1, I2, I3, I4, w1, w2));
+    rcpp_result_gen = Rcpp::wrap(hessianC(riskset1, riskset2, logtheta1, logtheta2, deriv, delta1, delta2, df, I1, I2, I3, I4));
     return rcpp_result_gen;
 END_RCPP
 }
 // hessianNew
-arma::mat hessianNew(const arma::colvec& riskset1, const arma::colvec& riskset2, const arma::colvec& logtheta1, const arma::colvec& logtheta2, const arma::colvec& delta1, const arma::colvec& delta2, const arma::colvec& I1, const arma::colvec& I2, const arma::colvec& I3, const arma::colvec& I4, const arma::mat& X1, const arma::mat& X2, const arma::uvec& idxN1, const arma::uvec& idxN2, const arma::colvec& w1, const arma::colvec& w2);
-RcppExport SEXP _CRFpackage_hessianNew(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP X1SEXP, SEXP X2SEXP, SEXP idxN1SEXP, SEXP idxN2SEXP, SEXP w1SEXP, SEXP w2SEXP) {
+arma::mat hessianNew(const arma::colvec& riskset1, const arma::colvec& riskset2, const arma::colvec& logtheta1, const arma::colvec& logtheta2, const arma::colvec& delta1, const arma::colvec& delta2, const arma::colvec& I1, const arma::colvec& I2, const arma::colvec& I3, const arma::colvec& I4, const arma::mat& X1, const arma::mat& X2, const arma::uvec& idxN1, const arma::uvec& idxN2);
+RcppExport SEXP _CRFpackage_hessianNew(SEXP riskset1SEXP, SEXP riskset2SEXP, SEXP logtheta1SEXP, SEXP logtheta2SEXP, SEXP delta1SEXP, SEXP delta2SEXP, SEXP I1SEXP, SEXP I2SEXP, SEXP I3SEXP, SEXP I4SEXP, SEXP X1SEXP, SEXP X2SEXP, SEXP idxN1SEXP, SEXP idxN2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -240,9 +234,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat& >::type X2(X2SEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type idxN1(idxN1SEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type idxN2(idxN2SEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type w1(w1SEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type w2(w2SEXP);
-    rcpp_result_gen = Rcpp::wrap(hessianNew(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, X1, X2, idxN1, idxN2, w1, w2));
+    rcpp_result_gen = Rcpp::wrap(hessianNew(riskset1, riskset2, logtheta1, logtheta2, delta1, delta2, I1, I2, I3, I4, X1, X2, idxN1, idxN2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -278,11 +270,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CRFpackage_risksetC", (DL_FUNC) &_CRFpackage_risksetC, 2},
     {"_CRFpackage_DeltaC", (DL_FUNC) &_CRFpackage_DeltaC, 2},
     {"_CRFpackage_logLikC", (DL_FUNC) &_CRFpackage_logLikC, 14},
-    {"_CRFpackage_gradientC", (DL_FUNC) &_CRFpackage_gradientC, 16},
-    {"_CRFpackage_gradientNew", (DL_FUNC) &_CRFpackage_gradientNew, 18},
+    {"_CRFpackage_gradientC", (DL_FUNC) &_CRFpackage_gradientC, 14},
+    {"_CRFpackage_gradientNew", (DL_FUNC) &_CRFpackage_gradientNew, 16},
     {"_CRFpackage_gradientPoly", (DL_FUNC) &_CRFpackage_gradientPoly, 14},
-    {"_CRFpackage_hessianC", (DL_FUNC) &_CRFpackage_hessianC, 14},
-    {"_CRFpackage_hessianNew", (DL_FUNC) &_CRFpackage_hessianNew, 16},
+    {"_CRFpackage_hessianC", (DL_FUNC) &_CRFpackage_hessianC, 12},
+    {"_CRFpackage_hessianNew", (DL_FUNC) &_CRFpackage_hessianNew, 14},
     {"_CRFpackage_hessianPolyC", (DL_FUNC) &_CRFpackage_hessianPolyC, 12},
     {NULL, NULL, 0}
 };
